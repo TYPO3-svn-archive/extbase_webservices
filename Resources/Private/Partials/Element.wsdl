@@ -1,0 +1,7 @@
+<{document.namespacePrefix}{child.tagName}
+	<f:if condition="{child.name}">name="{child.name}"</f:if>
+	>
+	<f:for each="{child.children}" as="grandchild">
+		<f:render partial="Element" arguments="{document:document, child:grandchild}" />
+	</f:for>
+</{document.namespacePrefix}{child.tagName}>

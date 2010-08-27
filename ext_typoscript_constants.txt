@@ -1,0 +1,1 @@
+config.extbase_webservices.typeNum = 5177

@@ -1,0 +1,8 @@
+<{document.namespacePrefix}{document.tagName}
+	xmlns{document.namespacePrefix}="{document.namespace}"
+	targetNamespace="{document.targetNamespace}"
+	>
+	<f:for each="{document.children}" as="child">
+		<f:render partial="Element" arguments="{document:document, child:child}" />
+	</f:for>
+</{document.namespacePrefix}{document.tagName}>

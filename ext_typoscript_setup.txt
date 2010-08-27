@@ -1,0 +1,40 @@
+extbase_webservices = PAGE
+extbase_webservices {
+	includeLibs.tx_extbasewebservices_dispatcher = EXT:extbase_webservices/Classes/Dispatcher.php
+	10 = CONTENT
+	10 {
+		table = tt_content
+		select.orderBy = sorting
+		select.where = hidden=0 AND deleted=0
+		select.languageField = sys_language_uid
+		renderObj < tt_content.list.20
+	}
+	config {
+		additionalHeaders = content-type:text/xml
+		disableAllHeaderCode = 1
+		disableCharsetHeader = 1
+		disablePrefixComment = 1
+		extbaseWebservices = 1
+		noCache = 1
+		tx_extbase {
+			webservice {
+				request {
+					className = Tx_ExtbaseWebservices_MVC_Web_WebserviceRequest
+					format {
+						wsdl {
+							action = wsdl
+							view {
+								templatePathAndFilename = EXT:extbase_webservices/Resources/Private/Templates/Generic/Wsdl.wsdl
+								partialRootPath = EXT:extbase_webservices/Resources/Private/Partials/
+							}
+						}
+						soap {
+							layoutRootPath = EXT:extbase_webservices/Resources/Private/Layouts/
+						}
+					}
+				}
+			}
+		}
+	}
+	typeNum = {$config.extbase_webservices.typeNum}
+}
