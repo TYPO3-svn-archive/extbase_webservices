@@ -28,7 +28,6 @@ class Tx_ExtbaseWebservices_Dispatcher extends Tx_Extbase_Dispatcher {
 		$request = $requestBuilder->initialize(self::$extbaseFrameworkConfiguration);
 		$request = $requestBuilder->build();
 
-//die();
 		if($requestBuilder->getRequestFormatConfiguration()) {
 			self::$extbaseFrameworkConfiguration = t3lib_div::array_merge_recursive_overrule(self::$extbaseFrameworkConfiguration, $requestBuilder->getRequestFormatConfiguration());
 		}

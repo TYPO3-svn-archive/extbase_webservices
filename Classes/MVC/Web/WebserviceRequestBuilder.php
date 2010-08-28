@@ -36,15 +36,16 @@
  */
 class Tx_ExtbaseWebservices_MVC_Web_WebserviceRequestBuilder extends Tx_Extbase_MVC_Web_RequestBuilder {
 
-	/*
+	/**
 	 * The webservice request configuration
 	 * @var array
 	 */
 	protected $requestConfiguration;
 
 
-	/*
+	/**
 	 * The webservice format individual configuration
+	 * @var array
 	 */
 	protected $requestFormatConfiguration;
 
@@ -99,6 +100,8 @@ class Tx_ExtbaseWebservices_MVC_Web_WebserviceRequestBuilder extends Tx_Extbase_
 			$request->setTypeNum($parameters['typeNum']);
 		}
 
+		$request = $this->parseAndSetHttpHeaders($request);
+
 		$request->setPluginName($this->pluginName);
 		$request->setControllerExtensionName($this->extensionName);
 		$request->setControllerName($controllerName);
@@ -112,6 +115,34 @@ class Tx_ExtbaseWebservices_MVC_Web_WebserviceRequestBuilder extends Tx_Extbase_
 			$request->setArgument($argumentName, $argumentValue);
 		}
 
+		return $request;
+	}
+
+/**
+	* parses HTTP request headers.
+	*
+	* The following fields are set by this function (when successful)
+	*
+	* headers
+	* request
+	* xml_encoding
+	* SOAPAction
+	* @param Tx_Extbase_MVC_Web_Request
+	* @return Tx_Extbase_MVC_Web_Request
+	*/
+	protected function parseAndSetHttpHeaders(Tx_Extbase_MVC_Web_Request $request) {
+		if(isset($_SERVER) && is_array($_SERVER)){
+			$accessibleProperties = Tx_Extbase_Reflection_ObjectAccess::getAccessiblePropertyNames($request);
+			foreach ($_SERVER as $headerType => $headerValue) {
+				$methodName = 'set' . t3lib_div::underscoredToUpperCamelCase($headerType);
+				$propertyName = t3lib_div::underscoredToLowerCamelCase($headerType);
+				if(in_array($propertyName, $accessibleProperties)) {
+					$request->$methodName($headerValue);
+				}
+			}
+		} else {
+			throw Exception('HTTP headers not accessible', 1282922655);
+		}
 		return $request;
 	}
 

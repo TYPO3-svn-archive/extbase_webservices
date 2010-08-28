@@ -38,122 +38,122 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	 * @var array
 	 * @access private
 	 */
-	var $headers = array();
+	protected $headers = array();
 	/**
 	 * HTTP request
 	 * @var string
 	 * @access private
 	 */
-	var $request = '';
+	protected $request = '';
 	/**
 	 * SOAP headers from request (incomplete namespace resolution; special characters not escaped) (text)
 	 * @var string
 	 * @access public
 	 */
-	var $requestHeaders = '';
+	public $requestHeaders = '';
 	/**
 	 * SOAP Headers from request (parsed)
 	 * @var mixed
 	 * @access public
 	 */
-	var $requestHeader = NULL;
+	public $requestHeader = NULL;
 	/**
 	 * SOAP body request portion (incomplete namespace resolution; special characters not escaped) (text)
 	 * @var string
 	 * @access public
 	 */
-	var $document = '';
+	public $document = '';
 	/**
 	 * SOAP payload for request (text)
 	 * @var string
 	 * @access public
 	 */
-	var $requestSOAP = '';
+	public $requestSOAP = '';
 	/**
 	 * requested method namespace URI
 	 * @var string
 	 * @access private
 	 */
-	var $methodURI = '';
+	protected $methodURI = '';
 	/**
 	 * name of method requested
 	 * @var string
 	 * @access private
 	 */
-	var $methodname = '';
+	protected $methodname = '';
 	/**
 	 * method parameters from request
 	 * @var array
 	 * @access private
 	 */
-	var $methodparams = array();
+	protected $methodparams = array();
 	/**
 	 * SOAP Action from request
 	 * @var string
 	 * @access private
 	 */
-	var $SOAPAction = '';
+	protected $SOAPAction = '';
 	/**
 	 * character set encoding of incoming (request) messages
 	 * @var string
 	 * @access public
 	 */
-	var $xml_encoding = '';
+	public $xml_encoding = '';
 	/**
 	 * toggles whether the parser decodes element content w/ utf8_decode()
 	 * @var boolean
 	 * @access public
 	 */
-	var $decode_utf8 = true;
+	public $decode_utf8 = true;
 
 	/**
 	 * HTTP headers of response
 	 * @var array
 	 * @access public
 	 */
-	var $outgoing_headers = array();
+	public $outgoing_headers = array();
 	/**
 	 * HTTP response
 	 * @var string
 	 * @access private
 	 */
-	var $response = '';
+	protected $response = '';
 	/**
 	 * SOAP headers for response (text or array of soapval or associative array)
 	 * @var mixed
 	 * @access public
 	 */
-	var $responseHeaders = '';
+	public $responseHeaders = '';
 	/**
 	 * SOAP payload for response (text)
 	 * @var string
 	 * @access private
 	 */
-	var $responseSOAP = '';
+	protected $responseSOAP = '';
 	/**
 	 * method return value to place in response
 	 * @var mixed
 	 * @access private
 	 */
-	var $methodreturn = false;
+	protected $methodreturn = false;
 	/**
 	 * whether $methodreturn is a string of literal XML
 	 * @var boolean
 	 * @access public
 	 */
-	var $methodreturnisliteralxml = false;
+	public $methodreturnisliteralxml = false;
 	/**
 	 * SOAP fault for response (or false)
 	 * @var mixed
 	 * @access private
 	 */
-	var $fault = false;
+	protected $fault = false;
 	/**
 	 * text indication of result (for debugging)
 	 * @var string
 	 * @access private
 	 */
-	var $result = 'successful';
+	protected $result = 'successful';
 
 	/**
 	 * assoc array of operations => opData; operations are added by the register()
@@ -161,25 +161,25 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	 * @var array
 	 * @access private
 	 */
-	var $operations = array();
+	protected $operations = array();
 	/**
 	 * wsdl instance (if one)
 	 * @var mixed
 	 * @access private
 	 */
-	var $wsdl = false;
+	protected $wsdl = false;
 	/**
 	 * URL for WSDL (if one)
 	 * @var mixed
 	 * @access private
 	 */
-	var $externalWSDLURL = false;
+	protected $externalWSDLURL = false;
 	/**
 	 * whether to append debug to response as XML comment
 	 * @var boolean
 	 * @access public
 	 */
-	var $debug_flag = false;
+	public $debug_flag = false;
 
 
 	/**
@@ -187,9 +187,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* the optional parameter is a path to a WSDL file that you'd like to bind the server instance to.
 	*
 	* @param mixed $wsdl file path or URL (string), or wsdl instance (object)
-	* @access   public
+	* @return void
 	*/
-	function nusoap_server($wsdl=false){
+	public function nusoap_server($wsdl=false){
 		parent::nusoap_base();
 		// turn on debugging?
 		global $debug;
@@ -250,9 +250,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* processes request and returns response
 	*
 	* @param	string $data usually is the value of $HTTP_RAW_POST_DATA
-	* @access   public
+	* @return	void
 	*/
-	function service($data){
+	public function service($data){
 		global $HTTP_SERVER_VARS;
 
 		if (isset($_SERVER['REQUEST_METHOD'])) {
@@ -324,121 +324,121 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 		}
 	}
 
-	/**
-	* parses HTTP request headers.
-	*
-	* The following fields are set by this function (when successful)
-	*
-	* headers
-	* request
-	* xml_encoding
-	* SOAPAction
-	*
-	* @access   private
-	*/
-	function parse_http_headers() {
-		global $HTTP_SERVER_VARS;
-
-		$this->request = '';
-		$this->SOAPAction = '';
-		if(function_exists('getallheaders')){
-			$this->debug("In parse_http_headers, use getallheaders");
-			$headers = getallheaders();
-			foreach($headers as $k=>$v){
-				$k = strtolower($k);
-				$this->headers[$k] = $v;
-				$this->request .= "$k: $v\r\n";
-				$this->debug("$k: $v");
-			}
-			// get SOAPAction header
-			if(isset($this->headers['soapaction'])){
-				$this->SOAPAction = str_replace('"','',$this->headers['soapaction']);
-			}
-			// get the character encoding of the incoming request
-			if(isset($this->headers['content-type']) && strpos($this->headers['content-type'],'=')){
-				$enc = str_replace('"','',substr(strstr($this->headers["content-type"],'='),1));
-				if(preg_match('/^(ISO-8859-1|US-ASCII|UTF-8)$/i',$enc)){
-					$this->xml_encoding = strtoupper($enc);
-				} else {
-					$this->xml_encoding = 'US-ASCII';
-				}
-			} else {
-				// should be US-ASCII for HTTP 1.0 or ISO-8859-1 for HTTP 1.1
-				$this->xml_encoding = 'ISO-8859-1';
-			}
-		} elseif(isset($_SERVER) && is_array($_SERVER)){
-			$this->debug("In parse_http_headers, use _SERVER");
-			foreach ($_SERVER as $k => $v) {
-				if (substr($k, 0, 5) == 'HTTP_') {
-					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($k, 5))));
-				} else {
-					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', $k)));
-				}
-				if ($k == 'soapaction') {
-					// get SOAPAction header
-					$k = 'SOAPAction';
-					$v = str_replace('"', '', $v);
-					$v = str_replace('\\', '', $v);
-					$this->SOAPAction = $v;
-				} else if ($k == 'content-type') {
-					// get the character encoding of the incoming request
-					if (strpos($v, '=')) {
-						$enc = substr(strstr($v, '='), 1);
-						$enc = str_replace('"', '', $enc);
-						$enc = str_replace('\\', '', $enc);
-						if (preg_match('/^(ISO-8859-1|US-ASCII|UTF-8)$/i',$enc)) {
-							$this->xml_encoding = strtoupper($enc);
-						} else {
-							$this->xml_encoding = 'US-ASCII';
-						}
-					} else {
-						// should be US-ASCII for HTTP 1.0 or ISO-8859-1 for HTTP 1.1
-						$this->xml_encoding = 'ISO-8859-1';
-					}
-				}
-				$this->headers[$k] = $v;
-				$this->request .= "$k: $v\r\n";
-				$this->debug("$k: $v");
-			}
-		} elseif (is_array($HTTP_SERVER_VARS)) {
-			$this->debug("In parse_http_headers, use HTTP_SERVER_VARS");
-			foreach ($HTTP_SERVER_VARS as $k => $v) {
-				if (substr($k, 0, 5) == 'HTTP_') {
-					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($k, 5)))); 											 $k = strtolower(substr($k, 5));
-				} else {
-					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', $k))); 											 $k = strtolower($k);
-				}
-				if ($k == 'soapaction') {
-					// get SOAPAction header
-					$k = 'SOAPAction';
-					$v = str_replace('"', '', $v);
-					$v = str_replace('\\', '', $v);
-					$this->SOAPAction = $v;
-				} else if ($k == 'content-type') {
-					// get the character encoding of the incoming request
-					if (strpos($v, '=')) {
-						$enc = substr(strstr($v, '='), 1);
-						$enc = str_replace('"', '', $enc);
-						$enc = str_replace('\\', '', $enc);
-						if (preg_match('/^(ISO-8859-1|US-ASCII|UTF-8)$/i',$enc)) {
-							$this->xml_encoding = strtoupper($enc);
-						} else {
-							$this->xml_encoding = 'US-ASCII';
-						}
-					} else {
-						// should be US-ASCII for HTTP 1.0 or ISO-8859-1 for HTTP 1.1
-						$this->xml_encoding = 'ISO-8859-1';
-					}
-				}
-				$this->headers[$k] = $v;
-				$this->request .= "$k: $v\r\n";
-				$this->debug("$k: $v");
-			}
-		} else {
-			$this->debug("In parse_http_headers, HTTP headers not accessible");
-			$this->setError("HTTP headers not accessible");
-		}
-	}
+//	/**
+//	* parses HTTP request headers.
+//	*
+//	* The following fields are set by this function (when successful)
+//	*
+//	* headers
+//	* request
+//	* xml_encoding
+//	* SOAPAction
+//	*
+//
+//	*/
+//	protected function parse_http_headers() {
+//		global $HTTP_SERVER_VARS;
+//
+//		$this->request = '';
+//		$this->SOAPAction = '';
+//		if(function_exists('getallheaders')){
+//			$this->debug("In parse_http_headers, use getallheaders");
+//			$headers = getallheaders();
+//			foreach($headers as $k=>$v){
+//				$k = strtolower($k);
+//				$this->headers[$k] = $v;
+//				$this->request .= "$k: $v\r\n";
+//				$this->debug("$k: $v");
+//			}
+//			// get SOAPAction header
+//			if(isset($this->headers['soapaction'])){
+//				$this->SOAPAction = str_replace('"','',$this->headers['soapaction']);
+//			}
+//			// get the character encoding of the incoming request
+//			if(isset($this->headers['content-type']) && strpos($this->headers['content-type'],'=')){
+//				$enc = str_replace('"','',substr(strstr($this->headers["content-type"],'='),1));
+//				if(preg_match('/^(ISO-8859-1|US-ASCII|UTF-8)$/i',$enc)){
+//					$this->xml_encoding = strtoupper($enc);
+//				} else {
+//					$this->xml_encoding = 'US-ASCII';
+//				}
+//			} else {
+//				// should be US-ASCII for HTTP 1.0 or ISO-8859-1 for HTTP 1.1
+//				$this->xml_encoding = 'ISO-8859-1';
+//			}
+//		} elseif(isset($_SERVER) && is_array($_SERVER)){
+//			$this->debug("In parse_http_headers, use _SERVER");
+//			foreach ($_SERVER as $k => $v) {
+//				if (substr($k, 0, 5) == 'HTTP_') {
+//					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($k, 5))));
+//				} else {
+//					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', $k)));
+//				}
+//				if ($k == 'soapaction') {
+//					// get SOAPAction header
+//					$k = 'SOAPAction';
+//					$v = str_replace('"', '', $v);
+//					$v = str_replace('\\', '', $v);
+//					$this->SOAPAction = $v;
+//				} else if ($k == 'content-type') {
+//					// get the character encoding of the incoming request
+//					if (strpos($v, '=')) {
+//						$enc = substr(strstr($v, '='), 1);
+//						$enc = str_replace('"', '', $enc);
+//						$enc = str_replace('\\', '', $enc);
+//						if (preg_match('/^(ISO-8859-1|US-ASCII|UTF-8)$/i',$enc)) {
+//							$this->xml_encoding = strtoupper($enc);
+//						} else {
+//							$this->xml_encoding = 'US-ASCII';
+//						}
+//					} else {
+//						// should be US-ASCII for HTTP 1.0 or ISO-8859-1 for HTTP 1.1
+//						$this->xml_encoding = 'ISO-8859-1';
+//					}
+//				}
+//				$this->headers[$k] = $v;
+//				$this->request .= "$k: $v\r\n";
+//				$this->debug("$k: $v");
+//			}
+//		} elseif (is_array($HTTP_SERVER_VARS)) {
+//			$this->debug("In parse_http_headers, use HTTP_SERVER_VARS");
+//			foreach ($HTTP_SERVER_VARS as $k => $v) {
+//				if (substr($k, 0, 5) == 'HTTP_') {
+//					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', substr($k, 5)))); 											 $k = strtolower(substr($k, 5));
+//				} else {
+//					$k = str_replace(' ', '-', strtolower(str_replace('_', ' ', $k))); 											 $k = strtolower($k);
+//				}
+//				if ($k == 'soapaction') {
+//					// get SOAPAction header
+//					$k = 'SOAPAction';
+//					$v = str_replace('"', '', $v);
+//					$v = str_replace('\\', '', $v);
+//					$this->SOAPAction = $v;
+//				} else if ($k == 'content-type') {
+//					// get the character encoding of the incoming request
+//					if (strpos($v, '=')) {
+//						$enc = substr(strstr($v, '='), 1);
+//						$enc = str_replace('"', '', $enc);
+//						$enc = str_replace('\\', '', $enc);
+//						if (preg_match('/^(ISO-8859-1|US-ASCII|UTF-8)$/i',$enc)) {
+//							$this->xml_encoding = strtoupper($enc);
+//						} else {
+//							$this->xml_encoding = 'US-ASCII';
+//						}
+//					} else {
+//						// should be US-ASCII for HTTP 1.0 or ISO-8859-1 for HTTP 1.1
+//						$this->xml_encoding = 'ISO-8859-1';
+//					}
+//				}
+//				$this->headers[$k] = $v;
+//				$this->request .= "$k: $v\r\n";
+//				$this->debug("$k: $v");
+//			}
+//		} else {
+//			$this->debug("In parse_http_headers, HTTP headers not accessible");
+//			$this->setError("HTTP headers not accessible");
+//		}
+//	}
 
 	/**
 	* parses a request
@@ -460,9 +460,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* This sets the fault field on error
 	*
 	* @param	string $data XML string
-	* @access   private
+
 	*/
-	function parse_request($data='') {
+	protected function parse_request($data='') {
 		$this->debug('entering parse_request()');
 		$this->parse_http_headers();
 		$this->debug('got character encoding: '.$this->xml_encoding);
@@ -507,9 +507,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	*
 	* This sets the fault field on error
 	*
-	* @access   private
+
 	*/
-	function invoke_method() {
+	protected function invoke_method() {
 		$this->debug('in invoke_method, methodname=' . $this->methodname . ' methodURI=' . $this->methodURI . ' SOAPAction=' . $this->SOAPAction);
 
 		//
@@ -664,9 +664,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	*
 	* This sets the fault field on error
 	*
-	* @access   private
+
 	*/
-	function serialize_return() {
+	protected function serialize_return() {
 		$this->debug('Entering serialize_return methodname: ' . $this->methodname . ' methodURI: ' . $this->methodURI);
 		// if fault
 		if (isset($this->methodreturn) && is_object($this->methodreturn) && ((get_class($this->methodreturn) == 'soap_fault') || (get_class($this->methodreturn) == 'nusoap_fault'))) {
@@ -764,9 +764,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* outgoing_headers
 	* response
 	*
-	* @access   private
+
 	*/
-	function send_response() {
+	protected function send_response() {
 		$this->debug('Enter send_response');
 		if ($this->fault) {
 			$payload = $this->fault->serialize();
@@ -843,9 +843,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* @param	string	$operation	The operation to be invoked
 	* @param	array	$request	The array of parameter values
 	* @return	boolean	Whether the operation was found
-	* @access   private
+
 	*/
-	function verify_method($operation,$request){
+	protected function verify_method($operation,$request){
 		if(isset($this->wsdl) && is_object($this->wsdl)){
 			if($this->wsdl->getOperationData($operation)){
 				return true;
@@ -862,9 +862,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* @param	array	$headers	The HTTP headers
 	* @param	string	$data		unprocessed request data from client
 	* @return	mixed	value of the message, decoded into a PHP type
-	* @access   private
+
 	*/
-	function parseRequest($headers, $data) {
+	protected function parseRequest($headers, $data) {
 		$this->debug('Entering parseRequest() for data of length ' . strlen($data) . ' headers:');
 		$this->appendDebug($this->varDump($headers));
 		if (!isset($headers['content-type'])) {
@@ -955,7 +955,7 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* @param	string $methodname
 	* @param	string $in array of input values
 	* @param	string $out array of output values
-	* @access   public
+
 	* @deprecated
 	*/
 	function add_to_map($methodname,$in,$out){
@@ -974,9 +974,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* @param	mixed $use optional (encoded|literal) or false
 	* @param	string $documentation optional Description to include in WSDL
 	* @param	string $encodingStyle optional (usually 'http://schemas.xmlsoap.org/soap/encoding/' for encoded)
-	* @access   public
+
 	*/
-	function register($name,$in=array(),$out=array(),$namespace=false,$soapaction=false,$style=false,$use=false,$documentation='',$encodingStyle=''){
+	public function register($name,$in=array(),$out=array(),$namespace=false,$soapaction=false,$style=false,$use=false,$documentation='',$encodingStyle=''){
 		global $HTTP_SERVER_VARS;
 
 		if($this->externalWSDLURL){
@@ -1043,9 +1043,9 @@ class Tx_ExtbaseWebservices_Service_Soap extends nusoap_base {
 	* @param	string $faultstring
 	* @param	string $faultactor
 	* @param	string $faultdetail
-	* @access   public
+
 	*/
-	function fault($faultcode,$faultstring,$faultactor='',$faultdetail=''){
+	public function fault($faultcode,$faultstring,$faultactor='',$faultdetail=''){
 		if ($faultdetail == '' && $this->debug_flag) {
 			$faultdetail = $this->getDebug();
 		}

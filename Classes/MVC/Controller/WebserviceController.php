@@ -53,6 +53,13 @@ class Tx_ExtbaseWebservices_MVC_Controller_WebserviceController extends Tx_Extba
 		$this->uriBuilder->setRequest($request);
 
 		$this->actionMethodName = $this->resolveActionMethodName();
+//TODO: Create an Service
+		if($this->request->getFormat() == 'soap') {
+			$this->webService = t3lib_div::makeInstance('Tx_ExtbaseWebservices_Service_Soap');
+			$this->webService->setWsdl($this->uriBuilder->uriForWsdl());
+			$this->webService->setRequest($this->request);
+			$this->webService->setResponse($this->response);
+		}
 
 		$this->initializeActionMethodArguments();
 		$this->initializeActionMethodValidators();
@@ -81,29 +88,24 @@ class Tx_ExtbaseWebservices_MVC_Controller_WebserviceController extends Tx_Extba
 	 * @return void
 	 * @api
 	 */
-	protected function callActionMethod() {
-		$argumentsAreValid = TRUE;
-		$preparedArguments = array();
-		foreach ($this->arguments as $argument) {
-			$preparedArguments[] = $argument->getValue();
-		}
-
-		if ($this->argumentsMappingResults->hasErrors()) {
-			$actionResult = call_user_func(array($this, $this->errorMethodName));
-		} else {
-			if($this->request->getFormat() == 'soap') {
-				$this->soapService = t3lib_div::makeInstance('Tx_ExtbaseWebservices_Service_Soap', $this->uriBuilder->uriForWsdl());
-				$this->soapService->injectRequest($this->request);
-				$this->soapService->injectResponse($this->response);
-			} else {
-				$actionResult = call_user_func_array(array($this, $this->actionMethodName), $preparedArguments);
-			}
-		}
-		if ($actionResult === NULL && $this->view instanceof Tx_Extbase_MVC_View_ViewInterface) {
-			$this->response->appendContent($this->view->render());
-		} elseif (is_string($actionResult) && strlen($actionResult) > 0) {
-			$this->response->appendContent($actionResult);
-		}
+//	protected function callActionMethod() {
+//		$argumentsAreValid = TRUE;
+//		$preparedArguments = array();
+//		foreach ($this->arguments as $argument) {
+//			$preparedArguments[] = $argument->getValue();
+//		}
+//
+//		if ($this->argumentsMappingResults->hasErrors()) {
+//			$actionResult = call_user_func(array($this, $this->errorMethodName));
+//		} else {
+//				$actionResult = call_user_func_array(array($this, $this->actionMethodName), $preparedArguments);
+//			}
+//		}
+//		if ($actionResult === NULL && $this->view instanceof Tx_Extbase_MVC_View_ViewInterface) {
+//			$this->response->appendContent($this->view->render());
+//		} elseif (is_string($actionResult) && strlen($actionResult) > 0) {
+//			$this->response->appendContent($actionResult);
+//		}
 	}
 
 	/**
